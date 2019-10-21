@@ -1,0 +1,46 @@
+{
+  "name": "shougun-cast-player",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "browserslist": [
+    "last 3 Chrome major versions"
+  ],
+  "scripts": {
+    "build": "parcel build index.html --out-dir dist/receiver --public-url /shougun-cast-player/receiver/",
+    "check": "npm run lint && npm run build",
+    "dev": "parcel index.html -p 8080",
+    "lint": "tslint -p .",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run check",
+    "test": "mocha -r ts-node/register test/**/*-test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhleong/shougun-cast-player.git"
+  },
+  "author": "Daniel Leong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dhleong/shougun-cast-player/issues"
+  },
+  "homepage": "https://github.com/dhleong/shougun-cast-player#readme",
+  "dependencies": {
+    "debug": "^4.1.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.3",
+    "@types/chromecast-caf-receiver": "^3.0.17",
+    "@types/debug": "^4.1.5",
+    "@types/mocha": "^5.2.7",
+    "@types/parcel-bundler": "^1.12.1",
+    "@types/request-promise-native": "^1.0.17",
+    "@types/ws": "^6.0.3",
+    "chai": "^4.2.0",
+    "cssnano": "^4.1.10",
+    "mocha": "^6.2.2",
+    "parcel-bundler": "^1.12.4",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  }
+}
