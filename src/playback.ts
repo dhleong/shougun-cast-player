@@ -4,7 +4,22 @@ const debug = _debug("shougun:playback");
 import urllib from "url";
 
 import { PlayerManager } from "chromecast-caf-receiver/cast.framework";
-import { MediaInformation, RequestData, SeekRequestData } from "chromecast-caf-receiver/cast.framework.messages";
+import {
+    GenericMediaMetadata,
+    LoadRequestData,
+    MediaInformation,
+    RequestData,
+    SeekRequestData,
+} from "chromecast-caf-receiver/cast.framework.messages";
+
+/**
+ * Remove eg `http:` from an URL so it will load with the correct
+ * protocol depending on whether this page is served over HTTPS
+ * or HTTP
+ */
+function stripUrlProtocol(url: string) {
+    return url.replace(/^http[s]?:/, "");
+}
 
 export class PlaybackHandler {
     public static init(
@@ -24,14 +39,39 @@ export class PlaybackHandler {
         );
 
         playerManager.setMessageInterceptor(
+            "LOAD",
+            handler.interceptLoadMessage.bind(handler),
+        );
+        playerManager.setMessageInterceptor(
             "SEEK",
             handler.interceptSeekMessage.bind(handler),
+        );
+        playerManager.setMessageInterceptor(
+            "PLAY_AGAIN",
+            handler.interceptPlayAgainMessage.bind(handler),
         );
     }
 
     constructor(
         private readonly playerManager: PlayerManager,
     ) { }
+
+    public async interceptLoadMessage(message: RequestData) {
+        const m = message as LoadRequestData;
+
+        m.media.contentId = stripUrlProtocol(m.media.contentId);
+
+        const meta = m.media.metadata;
+        if (meta && (meta as GenericMediaMetadata).images) {
+            const genericMeta = meta as GenericMediaMetadata;
+            for (const image of genericMeta.images) {
+                image.url = stripUrlProtocol(image.url);
+            }
+        }
+
+        debug("LOAD REQUEST", m);
+        return m;
+    }
 
     public async interceptSeekMessage(message: SeekRequestData) {
         debug("SEEK REQUEST", message);
