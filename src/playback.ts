@@ -7,10 +7,11 @@ import { PlayerManager } from "chromecast-caf-receiver/cast.framework";
 import {
     GenericMediaMetadata,
     LoadRequestData,
-    MediaInformation,
     RequestData,
     SeekRequestData,
 } from "chromecast-caf-receiver/cast.framework.messages";
+
+import { ICustomCastData } from "./model";
 
 /**
  * Remove eg `http:` from an URL so it will load with the correct
@@ -26,17 +27,15 @@ export class PlaybackHandler {
         context: cast.framework.CastReceiverContext,
     ) {
         const playerManager = context.getPlayerManager();
-
         const handler = new PlaybackHandler(
             playerManager,
         );
 
-        playerManager.addEventListener(
-            cast.framework.events.category.CORE,
-            event => {
-                debug("EVENT", event);
-            },
-        );
+        // monkey patch to show the *actual* current time:
+        const original = playerManager.getCurrentTimeSec.bind(playerManager);
+        playerManager.getCurrentTimeSec = () => {
+            return original() + handler.getStartTimeForCurrentMedia();
+        };
 
         playerManager.setMessageInterceptor(
             "LOAD",
@@ -50,7 +49,13 @@ export class PlaybackHandler {
             "PLAY_AGAIN",
             handler.interceptPlayAgainMessage.bind(handler),
         );
+        playerManager.setMessageInterceptor(
+            "MEDIA_STATUS",
+            handler.interceptMediaStatusMessage.bind(handler),
+        );
     }
+
+    private readonly customDataMap: {[contentId: string]: ICustomCastData} = {};
 
     constructor(
         private readonly playerManager: PlayerManager,
@@ -69,6 +74,8 @@ export class PlaybackHandler {
             }
         }
 
+        this.customDataMap[m.media.contentId] = m.customData;
+
         debug("LOAD REQUEST", m);
         return m;
     }
@@ -76,26 +83,35 @@ export class PlaybackHandler {
     public async interceptSeekMessage(message: SeekRequestData) {
         debug("SEEK REQUEST", message);
         const { playerManager } = this;
-        const media = playerManager.getMediaInformation();
-        const now = playerManager.getCurrentTimeSec();
 
-        const customData = media.customData;
-        const lastStartTime = customData ? customData.startTimeAbsolute : 0;
-        const newStartTime = Math.max(0, lastStartTime + now + message.relativeTime);
-        return this.triggerSeekTo(media, newStartTime);
+        // NOTE: getCurrentTimeSec has been monkey-patched to be the
+        // correct absolute time here:
+        const now = playerManager.getCurrentTimeSec();
+        if (message.relativeTime) {
+            const newStartTime = Math.max(0, now + message.relativeTime);
+            return this.triggerSeekTo(newStartTime);
+        } else if (message.currentTime) {
+            return this.triggerSeekTo(message.currentTime);
+        } else {
+            debug("impossible seek request?");
+        }
     }
 
     public async interceptPlayAgainMessage(message: RequestData) {
         debug("PLAY AGAIN REQUEST", message);
-        const { playerManager } = this;
-        const media = playerManager.getMediaInformation();
-        return this.triggerSeekTo(media, 0);
+        return this.triggerSeekTo(0);
     }
 
-    private async triggerSeekTo(
-        media: MediaInformation,
-        newStartTime: number,
-    ) {
+    public async interceptMediaStatusMessage(message: RequestData) {
+        const m = message as unknown as cast.framework.messages.MediaStatus;
+
+        m.currentTime += this.getStartTimeForCurrentMedia();
+
+        return m;
+    }
+
+    private async triggerSeekTo(newStartTime: number) {
+        const media = this.playerManager.getMediaInformation();
 
         // FIXME don't destroy other query params that may be there
         const oldUrl = urllib.parse(media.contentId);
@@ -103,8 +119,10 @@ export class PlaybackHandler {
         const newUrl = urllib.format(oldUrl);
         debug(oldUrl, " -> ", newUrl);
 
+        const customData = this.getCustomDataForCurrentMedia();
+
         const newRequest = {
-            customData: Object.assign({}, media.customData, {
+            customData: Object.assign({}, customData, {
                 startTimeAbsolute: newStartTime,
             }),
             media: {
@@ -114,5 +132,21 @@ export class PlaybackHandler {
             },
         };
         this.playerManager.load(newRequest as any);
+    }
+
+    private getStartTimeForCurrentMedia() {
+        const customData = this.getCustomDataForCurrentMedia();
+        if (customData) {
+            return customData.startTimeAbsolute || 0;
+        }
+        return 0;
+    }
+
+    private getCustomDataForCurrentMedia() {
+        // NOTE: for some reason, customData from the LOAD request isn't necessarily here?
+        const media = this.playerManager.getMediaInformation();
+        if (!media) return;
+
+        return media.customData as ICustomCastData || this.customDataMap[media.contentId];
     }
 }
