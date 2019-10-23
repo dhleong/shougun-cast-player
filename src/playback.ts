@@ -127,7 +127,9 @@ export class PlaybackHandler {
 
         // NOTE: this may be unnecessary, but let's make sure that
         // we're using the monkey-patched duration
-        m.media.duration = this.playerManager.getDurationSec();
+        if (m.media) {
+            m.media.duration = this.playerManager.getDurationSec();
+        }
 
         return m;
     }
