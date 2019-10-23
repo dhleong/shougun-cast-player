@@ -19,7 +19,9 @@ import { ICustomCastData } from "./model";
  * or HTTP
  */
 function stripUrlProtocol(url: string) {
-    return url.replace(/^http[s]?:/, "");
+    // TODO: do this for non-local-network requests
+    // return url.replace(/^http[s]?:/, "");
+    return url;
 }
 
 export class PlaybackHandler {
