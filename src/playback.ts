@@ -152,6 +152,7 @@ export class PlaybackHandler {
             media: {
                 contentId: newUrl,
                 contentType: media.contentType,
+                metadata: media.metadata,
                 streamType: media.streamType,
             },
         };
