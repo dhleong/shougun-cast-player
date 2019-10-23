@@ -1,7 +1,7 @@
 import _debug from "debug";
 const debug = _debug("shougun:playback");
 
-import urllib from "url";
+import { setQueryParams } from "./url";
 
 import { PlayerManager } from "chromecast-caf-receiver/cast.framework";
 import {
@@ -133,11 +133,11 @@ export class PlaybackHandler {
     private async triggerSeekTo(newStartTime: number) {
         const media = this.playerManager.getMediaInformation();
 
-        // FIXME don't destroy other query params that may be there
-        const oldUrl = urllib.parse(media.contentId);
-        oldUrl.search = "?startTime=" + newStartTime;
-        const newUrl = urllib.format(oldUrl);
-        debug(oldUrl, " -> ", newUrl);
+        // update the URL with the new startTime
+        const newUrl = setQueryParams(media.contentId, {
+            startTime: newStartTime,
+        });
+        debug(media.contentId, " -> ", newUrl);
 
         const customData = this.getCustomDataForCurrentMedia();
 
