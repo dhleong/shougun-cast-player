@@ -32,9 +32,17 @@ export class PlaybackHandler {
         );
 
         // monkey patch to show the *actual* current time:
-        const original = playerManager.getCurrentTimeSec.bind(playerManager);
+        const originalTimeSec = playerManager.getCurrentTimeSec.bind(playerManager);
         playerManager.getCurrentTimeSec = () => {
-            return original() + handler.getStartTimeForCurrentMedia();
+            return originalTimeSec() + handler.getStartTimeForCurrentMedia();
+        };
+        const originalDurationSec = playerManager.getDurationSec.bind(playerManager);
+        playerManager.getDurationSec = () => {
+            const data = handler.getCustomDataForCurrentMedia();
+            if (data && data.durationSeconds) {
+                return data.durationSeconds;
+            }
+            return originalDurationSec();
         };
 
         playerManager.setMessageInterceptor(
@@ -76,6 +84,14 @@ export class PlaybackHandler {
 
         this.customDataMap[m.media.contentId] = m.customData;
 
+        if (m.customData && (m.customData as ICustomCastData).durationSeconds) {
+            debug("duration <- ", m.customData.durationSeconds);
+
+            // NOTE: the original media.duration property seems to
+            // get overriden at some point, so... we override it right back
+            // m.media.duration = ;
+        }
+
         debug("LOAD REQUEST", m);
         return m;
     }
@@ -106,6 +122,10 @@ export class PlaybackHandler {
         const m = message as unknown as cast.framework.messages.MediaStatus;
 
         m.currentTime += this.getStartTimeForCurrentMedia();
+
+        // NOTE: this may be unnecessary, but let's make sure that
+        // we're using the monkey-patched duration
+        m.media.duration = this.playerManager.getDurationSec();
 
         return m;
     }
