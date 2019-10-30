@@ -74,7 +74,11 @@ export class PlaybackHandler {
     public async interceptLoadMessage(message: RequestData) {
         const m = message as LoadRequestData;
 
-        m.media.contentId = stripUrlProtocol(m.media.contentId);
+        if (m.media.contentUrl) {
+            m.media.contentUrl = stripUrlProtocol(m.media.contentUrl);
+        } else {
+            m.media.contentId = stripUrlProtocol(m.media.contentId);
+        }
 
         const meta = m.media.metadata;
         if (meta && (meta as GenericMediaMetadata).images) {
@@ -138,10 +142,11 @@ export class PlaybackHandler {
         const media = this.playerManager.getMediaInformation();
 
         // update the URL with the new startTime
-        const newUrl = setQueryParams(media.contentId, {
+        const oldUrl = media.contentUrl || media.contentId;
+        const newUrl = setQueryParams(oldUrl, {
             startTime: newStartTime,
         });
-        debug(media.contentId, " -> ", newUrl);
+        debug(oldUrl, " -> ", newUrl);
 
         const customData = this.getCustomDataForCurrentMedia();
 
@@ -150,8 +155,9 @@ export class PlaybackHandler {
                 startTimeAbsolute: newStartTime,
             }),
             media: {
-                contentId: newUrl,
+                contentId: media.contentId,
                 contentType: media.contentType,
+                contentUrl: newUrl,
                 metadata: media.metadata,
                 streamType: media.streamType,
             },
