@@ -2,9 +2,11 @@
 <html>
 <head>
   <title>shougun</title>
+  <link rel="stylesheet" href="src/ui/less/styles.less" />
 </head>
 <body>
   <cast-media-player id="player"></cast-media-player>
+  <div id="shougun-overlay"></div>
   <style>
     #player {
         --theme-hue: 210;
@@ -12,7 +14,7 @@
     }
   </style>
   <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
-  <script src="src/index.ts"></script>
+  <script src="src/index.tsx"></script>
 </body>
 </html>
 
