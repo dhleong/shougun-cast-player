@@ -28,7 +28,8 @@
   "dependencies": {
     "debug": "^4.1.1",
     "react": "^16.11.0",
-    "react-dom": "^16.11.0"
+    "react-dom": "^16.11.0",
+    "the-mall": "^1.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.3",
