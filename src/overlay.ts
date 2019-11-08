@@ -3,7 +3,7 @@ const debug = _debug("shougun:overlay");
 
 const NS = "urn:x-cast:com.github.dhleong.shougun";
 
-import { addRecommendations } from "./ui/events";
+import { addRecommendations, setPlaying } from "./ui/events";
 import { IRecommendation, shougunStore } from "./ui/store";
 
 type IShougunEvent = IShougunRecommendEvent;
@@ -19,6 +19,20 @@ export class OverlayManager {
         context.addCustomMessageListener(NS, msg =>
             manager.onMessage(msg),
         );
+
+        context.getPlayerManager().addEventListener([
+            "PLAYING",
+            "LOAD_START",
+        ] as any, () => {
+            shougunStore.dispatch(setPlaying(true));
+        });
+        context.getPlayerManager().addEventListener([
+            "MEDIA_FINISHED",
+            "REQUEST_STOP",
+        ] as any, msg => {
+            debug("playback stopped", msg);
+            shougunStore.dispatch(setPlaying(false));
+        });
 
         if (_debug.enabled("shougun-debug:data")) {
             const { debugData } = require("./ui/debug");

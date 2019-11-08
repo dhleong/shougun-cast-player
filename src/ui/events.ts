@@ -25,3 +25,13 @@ export const addRecommendations = events.store((
 
     return updated;
 });
+
+export const setPlaying = events.store((
+    db: IShougunState,
+    isPlaying: boolean,
+) => {
+    return {
+        ...db,
+        isPlaying,
+    };
+});
