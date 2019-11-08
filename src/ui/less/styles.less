@@ -1,4 +1,5 @@
 @text-color: #f4f7ff;
+@overscan: 10vw;
 
 #shougun-overlay {
     position: absolute;
@@ -22,12 +23,13 @@
 
     & > .label {
         font-size: 20pt;
-        padding: 8px;
+        padding: 8px @overscan;
     }
 }
 
 @item-width: 20vw;
 @item-separation: 24px;
+@initial-margin: @overscan;
 
 @keyframes slide-carousel {
     from {
@@ -37,9 +39,9 @@
     to {
         @remaining: 1;
         @item-offsets: @remaining * @item-width;
-        @item-separations: (@remaining + 1) * @item-separation;
+        @item-separations: @remaining * @item-separation;
 
-        transform: translateX(calc(-100% + @item-offsets + @item-separations));
+        transform: translateX(calc(-100% + @item-offsets + @item-separations + @initial-margin));
     }
 }
 
@@ -57,7 +59,7 @@
     margin-right: @item-separation;
 
     &:first-child {
-        margin-left: @item-separation;
+        margin-left: @initial-margin;
     }
 
     .cover, .cover-image, .cover-label {

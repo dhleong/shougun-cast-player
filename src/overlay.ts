@@ -34,7 +34,7 @@ export class OverlayManager {
             shougunStore.dispatch(setPlaying(false));
         });
 
-        if (_debug.enabled("shougun:data")) {
+        if (_debug.enabled("shougun-debug:data")) {
             const { debugData } = require("./ui/debug");
             manager.showOverlay(debugData);
         }
