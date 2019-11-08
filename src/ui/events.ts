@@ -1,3 +1,6 @@
+import _debug from "debug";
+const debug = _debug("shougun:events");
+
 import { events } from "the-mall";
 
 import { IRecommendation, IShougunState } from "./store";
@@ -8,6 +11,7 @@ export const addRecommendations = events.store((
 ) => {
     const updated = { ...db };
 
+    debug("add recommendations:", recommendations);
     if (!updated.recommendations) {
         // initial results
         updated.recommendations = recommendations;
