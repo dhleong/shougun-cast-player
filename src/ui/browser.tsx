@@ -22,6 +22,18 @@ const CoverArt = ({item}: {item: IRecommendation}) => {
   );
 };
 
+const Title = ({item}: {item: IRecommendation}) => {
+  if (!item.cover) {
+    return null;
+  }
+
+  return (
+    <div className="title">
+      {item.title}
+    </div>
+  );
+};
+
 const CarouselItem = connect(({
   item,
 }: {
@@ -33,7 +45,7 @@ const CarouselItem = connect(({
       <div className="cover">
         <CoverArt item={item} />
       </div>
-      <div className="title">{item.title}</div>
+      <Title item={item} />
     </div>
   );
 });

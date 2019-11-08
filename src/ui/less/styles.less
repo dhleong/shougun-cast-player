@@ -1,3 +1,5 @@
+@text-color: #f4f7ff;
+
 #shougun-overlay {
     position: absolute;
     left: 0;
@@ -8,7 +10,7 @@
 
 .browser {
     background: #000;
-    color: #f4f7ff;
+    color: @text-color;
     height: 100vh;
 }
 
@@ -58,13 +60,26 @@
         margin-left: @item-separation;
     }
 
-    .cover, .cover-image {
+    .cover, .cover-image, .cover-label {
         max-width: @item-width;
         height: 35vh;
         object-fit: contain;
     }
 
+    .cover-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: @item-width;
+        height: 35vh;
+
+        font-size: 26pt;
+        text-align: center;
+    }
+
     .title {
+        color: fadeout(@text-color, 60%);
         font-size: 26pt;
         text-align: center;
         width: @item-width;
