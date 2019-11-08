@@ -9,7 +9,7 @@ const CoverArt = ({item}: {item: IRecommendation}) => {
   if (item.cover) {
     return (
       <img className="cover-image"
-        src={item.cover.replace("https:", "")}
+        src={item.cover}
         alt={item.title}
       />
     );
