@@ -1,0 +1,71 @@
+#shougun-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.browser {
+    background: #000;
+    color: #f4f7ff;
+    height: 100vh;
+}
+
+.carousel-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+
+    & > .label {
+        font-size: 20pt;
+        padding: 8px;
+    }
+}
+
+@item-width: 20vw;
+@item-separation: 24px;
+
+@keyframes slide-carousel {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        @remaining: 1;
+        @item-offsets: @remaining * @item-width;
+        @item-separations: (@remaining + 1) * @item-separation;
+
+        transform: translateX(calc(-100% + @item-offsets + @item-separations));
+    }
+}
+
+.carousel {
+    display: flex;
+    position: relative;
+    animation: linear slide-carousel infinite;
+    animation-duration: 10s;
+    width: fit-content;
+}
+
+.carousel-item {
+    max-width: @item-width;
+    margin-right: @item-separation;
+
+    &:first-child {
+        margin-left: @item-separation;
+    }
+
+    .cover, .cover-image {
+        max-width: @item-width;
+        height: 35vh;
+        object-fit: contain;
+    }
+
+    .title {
+        font-size: 26pt;
+        text-align: center;
+        width: @item-width;
+    }
+}
