@@ -3,7 +3,7 @@ const debug = _debug("shougun:overlay");
 
 const NS = "urn:x-cast:com.github.dhleong.shougun";
 
-import { addRecommendations, setPlaying } from "./ui/events";
+import { setPlaying, setRecommendations } from "./ui/events";
 import { IRecommendation, shougunStore } from "./ui/store";
 
 type IShougunEvent = IShougunRecommendEvent;
@@ -55,6 +55,6 @@ export class OverlayManager {
     public showOverlay(
         recommendations: IRecommendation[],
     ) {
-        shougunStore.dispatch(addRecommendations(recommendations));
+        shougunStore.dispatch(setRecommendations(recommendations));
     }
 }
