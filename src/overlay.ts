@@ -5,7 +5,7 @@ const NS = "urn:x-cast:com.github.dhleong.shougun";
 import { addRecommendations } from "./ui/events";
 import { IRecommendation, shougunStore } from "./ui/store";
 
-type IShougunEvent = IShougunRecommendEvent | cast.framework.events.Event;
+type IShougunEvent = IShougunRecommendEvent;
 
 interface IShougunRecommendEvent {
     type: "RECOMMEND";
@@ -16,7 +16,7 @@ export class OverlayManager {
     public static init(context: cast.framework.CastReceiverContext) {
         const manager = new OverlayManager();
         context.addCustomMessageListener(NS, msg =>
-            manager.onMessage(msg as unknown as IShougunEvent),
+            manager.onMessage(msg),
         );
 
         if (debug.enabled("shougun-debug:data")) {
@@ -36,7 +36,11 @@ export class OverlayManager {
         }
     }
 
-    public onMessage(msg: IShougunEvent) {
+    public onMessage(event: cast.framework.events.Event) {
+        debug("onMessage:", event);
+        const msg = (event as any).data as IShougunEvent;
+        if (!msg) return;
+
         switch (msg.type) {
         case "RECOMMEND":
             this.showOverlay(msg.recommendations);
