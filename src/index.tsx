@@ -7,6 +7,7 @@ if (process.env.NODE_ENV !== "production") {
     debug.enable("shougun:*");
 }
 
+import { OverlayManager } from "./overlay";
 import { PlaybackHandler } from "./playback";
 import { ShougunQueue } from "./queue";
 
@@ -18,6 +19,7 @@ const playbackConfig = new cast.framework.PlaybackConfig();
 const queue = ShougunQueue.create(context);
 
 PlaybackHandler.init(context/* , queue */);
+OverlayManager.init(context);
 
 // tslint:disable no-bitwise
 context.start({
