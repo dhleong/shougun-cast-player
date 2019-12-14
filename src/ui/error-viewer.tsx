@@ -16,8 +16,8 @@ export const ErrorViewer = connect(() => {
   const e = error().deref();
   if (!e) throw new Error("No error for ErrorViewer");
 
-  const detail = !e.detail ? null : (
-    <div className="detail">{e.detail}</div>
+  const detail = !e.details ? null : (
+    <div className="detail">{e.details}</div>
   );
 
   const stack = !(e.stack && e.stack.length) ? null : (

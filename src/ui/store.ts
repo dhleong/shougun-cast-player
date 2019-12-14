@@ -8,7 +8,7 @@ export interface IRecommendation {
 
 export interface IError {
     message: string;
-    detail?: string;
+    details?: string;
     stack?: string[];
 }
 
