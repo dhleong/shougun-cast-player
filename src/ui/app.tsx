@@ -15,7 +15,6 @@ const Router = connect(() => {
   }
 
   const e = error().deref();
-  console.log("route!", e);
   if (e) {
     return (
       <ErrorViewer />
