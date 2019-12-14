@@ -7,6 +7,10 @@ export const isPlaying = sub(() => {
     return store.isPlaying;
 });
 
+export const error = sub(() => {
+    return shougunStore.deref().error;
+});
+
 const recommendationsRaw = sub(() => {
     const store = shougunStore.deref();
     return store.recommendations;

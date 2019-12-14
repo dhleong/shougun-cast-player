@@ -5,9 +5,17 @@ export interface IRecommendation {
     id: string;
     title: string;
 }
+
+export interface IError {
+    message: string;
+    detail?: string;
+    stack?: string[];
+}
+
 export interface IShougunState {
     isPlaying: boolean;
 
+    error?: IError;
     recommendations?: IRecommendation[];
 }
 

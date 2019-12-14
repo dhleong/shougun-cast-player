@@ -3,7 +3,7 @@ const debug = _debug("shougun:events");
 
 import { events } from "the-mall";
 
-import { IRecommendation, IShougunState } from "./store";
+import { IError, IRecommendation, IShougunState } from "./store";
 
 export const addRecommendations = events.store((
     db: IShougunState,
@@ -39,12 +39,21 @@ export const setRecommendations = events.store((
     return updated;
 });
 
+export const setError = events.store((
+    db: IShougunState,
+    error: IError | undefined,
+) => ({
+    ...db,
+    error,
+} as IShougunState));
+
 export const setPlaying = events.store((
     db: IShougunState,
     isPlaying: boolean,
-) => {
-    return {
-        ...db,
-        isPlaying,
-    };
-});
+) => ({
+    ...db,
+    isPlaying,
+
+    // clear any error when we start playing
+    error: isPlaying ? undefined : db.error,
+} as IShougunState));
