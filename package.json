@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "build": "parcel build index.html --dist-dir dist/receiver --public-url /shougun-cast-player/receiver/",
-    "check": "npm run lint && npm test && npm run build",
+    "build:tsc": "tsc",
+    "check": "npm run lint && npm test && npm run build:tsc && npm run build",
     "dev": "parcel serve index.html -p 8080",
     "lint": "tslint -p .",
     "prepublishOnly": "npm run check",

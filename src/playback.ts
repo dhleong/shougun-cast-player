@@ -8,7 +8,6 @@ import {
     GenericMediaMetadata,
     LoadRequestData,
     MediaStatus,
-    MessageType,
     RequestData,
     SeekRequestData,
 } from "chromecast-caf-receiver/cast.framework.messages";
@@ -50,19 +49,19 @@ export class PlaybackHandler {
         };
 
         playerManager.setMessageInterceptor(
-            MessageType.LOAD,
+            cast.framework.messages.MessageType.LOAD,
             handler.interceptLoadMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            MessageType.SEEK,
+            cast.framework.messages.MessageType.SEEK,
             handler.interceptSeekMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            MessageType.PLAY_AGAIN,
+            cast.framework.messages.MessageType.PLAY_AGAIN,
             handler.interceptPlayAgainMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            MessageType.MEDIA_STATUS,
+            cast.framework.messages.MessageType.MEDIA_STATUS,
             handler.interceptMediaStatusMessage.bind(handler),
         );
     }
@@ -73,8 +72,8 @@ export class PlaybackHandler {
         private readonly playerManager: PlayerManager,
     ) { }
 
-    public async interceptLoadMessage(message: RequestData) {
-        const m = message as LoadRequestData;
+    public async interceptLoadMessage(message: LoadRequestData) {
+        const m = message;
 
         if (m.media.contentUrl) {
             m.media.contentUrl = stripUrlProtocol(m.media.contentUrl);
