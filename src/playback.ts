@@ -7,6 +7,8 @@ import { PlayerManager } from "chromecast-caf-receiver/cast.framework";
 import {
     GenericMediaMetadata,
     LoadRequestData,
+    MediaStatus,
+    MessageType,
     RequestData,
     SeekRequestData,
 } from "chromecast-caf-receiver/cast.framework.messages";
@@ -48,19 +50,19 @@ export class PlaybackHandler {
         };
 
         playerManager.setMessageInterceptor(
-            "LOAD",
+            MessageType.LOAD,
             handler.interceptLoadMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            "SEEK",
+            MessageType.SEEK,
             handler.interceptSeekMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            "PLAY_AGAIN",
+            MessageType.PLAY_AGAIN,
             handler.interceptPlayAgainMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            "MEDIA_STATUS",
+            MessageType.MEDIA_STATUS,
             handler.interceptMediaStatusMessage.bind(handler),
         );
     }
@@ -111,31 +113,31 @@ export class PlaybackHandler {
         const now = playerManager.getCurrentTimeSec();
         if (message.relativeTime) {
             const newStartTime = Math.max(0, now + message.relativeTime);
-            return this.triggerSeekTo(newStartTime);
+            await this.triggerSeekTo(newStartTime);
         } else if (message.currentTime) {
-            return this.triggerSeekTo(message.currentTime);
+            await this.triggerSeekTo(message.currentTime);
         } else {
             debug("impossible seek request?");
         }
+        return message;
     }
 
     public async interceptPlayAgainMessage(message: RequestData) {
         debug("PLAY AGAIN REQUEST", message);
-        return this.triggerSeekTo(0);
+        await this.triggerSeekTo(0);
+        return message;
     }
 
-    public async interceptMediaStatusMessage(message: RequestData) {
-        const m = message as unknown as cast.framework.messages.MediaStatus;
-
-        m.currentTime += this.getStartTimeForCurrentMedia();
+    public async interceptMediaStatusMessage(message: MediaStatus) {
+        message.currentTime += this.getStartTimeForCurrentMedia();
 
         // NOTE: this may be unnecessary, but let's make sure that
         // we're using the monkey-patched duration
-        if (m.media) {
-            m.media.duration = this.playerManager.getDurationSec();
+        if (message.media) {
+            message.media.duration = this.playerManager.getDurationSec();
         }
 
-        return m;
+        return message;
     }
 
     private async triggerSeekTo(newStartTime: number) {
@@ -151,9 +153,10 @@ export class PlaybackHandler {
         const customData = this.getCustomDataForCurrentMedia();
 
         const newRequest = {
-            customData: Object.assign({}, customData, {
+            customData: {
+                ...customData,
                 startTimeAbsolute: newStartTime,
-            }),
+            },
             media: {
                 contentId: media.contentId,
                 contentType: media.contentType,
