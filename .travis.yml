@@ -13,7 +13,4 @@ deploy:
     github_token: $GITHUB_DEPLOY # Set in travis-ci.org dashboard
     local_dir: dist
     on:
-        branch: master
-
-
-
+        branch: main
