@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/dhleong/shougun-cast-player#readme",
   "dependencies": {
+    "@babel/preset-typescript": "^7.10.4",
     "debug": "^4.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
