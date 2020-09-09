@@ -1,6 +1,6 @@
 import React from "react";
 
-import { connect } from "the-mall";
+import { connect } from "the-mall/macro";
 
 import { error } from "./subs";
 

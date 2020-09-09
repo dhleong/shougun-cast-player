@@ -1,4 +1,4 @@
-import { sub } from "the-mall";
+import { sub } from "the-mall/macro";
 
 import { shougunStore } from "./store";
 

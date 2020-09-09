@@ -48,9 +48,9 @@ export class OverlayManager {
         }
     }
 
-    public onMessage(event: cast.framework.events.Event) {
+    public onMessage(event: cast.framework.system.Event) {
         debug("onMessage:", event);
-        const msg = (event as any).data as IShougunEvent;
+        const msg = event.data as IShougunEvent;
         if (!msg) return;
 
         switch (msg.type) {
