@@ -4,9 +4,10 @@ import { connect, StoreProvider } from "the-mall/macro";
 
 import { Browser } from "./browser";
 import { ErrorViewer } from "./error-viewer";
+import { UiStateViewer } from "./ui-state-viewer";
 
 import { shougunStore } from "./store";
-import { error, isPlaying } from "./subs";
+import { error, isPlaying, uiState } from "./subs";
 
 const Router = connect(() => {
   if (isPlaying().deref()) {
@@ -17,7 +18,14 @@ const Router = connect(() => {
   const e = error().deref();
   if (e) {
     return (
-      <ErrorViewer />
+      <ErrorViewer e={e} />
+    );
+  }
+
+  const state = uiState().deref();
+  if (state) {
+    return (
+      <UiStateViewer ui={state} />
     );
   }
 

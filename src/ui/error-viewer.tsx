@@ -1,8 +1,6 @@
 import React from "react";
 
-import { connect } from "the-mall/macro";
-
-import { error } from "./subs";
+import { IError } from "./store";
 
 const StackTrace = ({ stack }: {
   stack: string[],
@@ -12,10 +10,11 @@ const StackTrace = ({ stack }: {
   );
 };
 
-export const ErrorViewer = connect(() => {
-  const e = error().deref();
-  if (!e) throw new Error("No error for ErrorViewer");
+export interface IErrorViewerProps {
+  e: IError;
+}
 
+export const ErrorViewer = ({ e }: IErrorViewerProps) => {
   const detail = !e.details ? null : (
     <div className="detail">{e.details}</div>
   );
@@ -31,4 +30,4 @@ export const ErrorViewer = connect(() => {
       {stack}
     </div>
   );
-});
+};

@@ -3,10 +3,22 @@ const debug = _debug("shougun:overlay");
 
 const NS = "urn:x-cast:com.github.dhleong.shougun";
 
-import { setError, setPlaying, setRecommendations } from "./ui/events";
-import { IError, IRecommendation, shougunStore } from "./ui/store";
+import {
+    setError,
+    setPlaying,
+    setRecommendations,
+    setUiState,
+} from "./ui/events";
+import {
+    IError,
+    IRecommendation,
+    IUiState,
+    shougunStore,
+} from "./ui/store";
 
-type IShougunEvent = IShougunErrorEvent | IShougunRecommendEvent;
+type IShougunEvent = IShougunErrorEvent
+    | IShougunRecommendEvent
+    | IShougunUiStateEvent;
 
 interface IShougunRecommendEvent {
     type: "RECOMMEND";
@@ -16,6 +28,11 @@ interface IShougunRecommendEvent {
 interface IShougunErrorEvent {
     type: "ERROR";
     error: IError;
+}
+
+interface IShougunUiStateEvent {
+    type: "UI";
+    state?: IUiState;
 }
 
 export class OverlayManager {
@@ -60,6 +77,10 @@ export class OverlayManager {
 
         case "RECOMMEND":
             this.showOverlay(msg.recommendations);
+            break;
+
+        case "UI":
+            shougunStore.dispatch(setUiState(msg.state));
             break;
         }
     }

@@ -3,7 +3,7 @@ const debug = _debug("shougun:events");
 
 import { events } from "the-mall/macro";
 
-import { IError, IRecommendation, IShougunState } from "./store";
+import { IError, IRecommendation, IShougunState, IUiState } from "./store";
 
 export const addRecommendations = events.store((
     db: IShougunState,
@@ -30,12 +30,15 @@ export const setRecommendations = events.store((
     db: IShougunState,
     recommendations: IRecommendation[],
 ) => {
-    const updated = {
+    const updated: IShougunState = {
         ...db,
-    };
-    updated.recommendations = recommendations;
-    debug("set recommendations:", recommendations);
+        error: undefined, // clear error, ui state
+        ui: undefined,
 
+        recommendations,
+    };
+
+    debug("set recommendations:", recommendations);
     return updated;
 });
 
@@ -45,6 +48,17 @@ export const setError = events.store((
 ) => ({
     ...db,
     error,
+} as IShougunState));
+
+export const setUiState = events.store((
+    db: IShougunState,
+    ui: IUiState | undefined,
+) => ({
+    ...db,
+    ui,
+
+    // also clear any error state
+    error: undefined,
 } as IShougunState));
 
 export const setPlaying = events.store((
