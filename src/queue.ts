@@ -8,7 +8,7 @@ export class ShougunQueue extends cast.framework.QueueBase {
     }
 
     constructor(
-        mgr: cast.framework.QueueManager,
+        private mgr: cast.framework.QueueManager,
     ) {
         super();
     }

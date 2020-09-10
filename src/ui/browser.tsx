@@ -1,6 +1,6 @@
 import React from "react";
 
-import { connect } from "the-mall/macro";
+import { connect } from "the-mall";
 
 import { IRecommendation } from "./store";
 import { isLoadingRecommendations, recommendations } from "./subs";

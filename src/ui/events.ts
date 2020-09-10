@@ -1,7 +1,7 @@
 import _debug from "debug";
 const debug = _debug("shougun:events");
 
-import { events } from "the-mall/macro";
+import { events } from "the-mall";
 
 import { IError, IRecommendation, IShougunState } from "./store";
 

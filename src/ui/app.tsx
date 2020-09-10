@@ -1,6 +1,6 @@
 import React from "react";
 
-import { connect, StoreProvider } from "the-mall/macro";
+import { connect, StoreProvider } from "the-mall";
 
 import { Browser } from "./browser";
 import { ErrorViewer } from "./error-viewer";

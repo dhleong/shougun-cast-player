@@ -7,7 +7,6 @@ import { PlayerManager } from "chromecast-caf-receiver/cast.framework";
 import {
     GenericMediaMetadata,
     LoadRequestData,
-    MediaStatus,
     RequestData,
     SeekRequestData,
 } from "chromecast-caf-receiver/cast.framework.messages";
@@ -49,19 +48,19 @@ export class PlaybackHandler {
         };
 
         playerManager.setMessageInterceptor(
-            cast.framework.messages.MessageType.LOAD,
+            "LOAD",
             handler.interceptLoadMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            cast.framework.messages.MessageType.SEEK,
+            "SEEK",
             handler.interceptSeekMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            cast.framework.messages.MessageType.PLAY_AGAIN,
+            "PLAY_AGAIN",
             handler.interceptPlayAgainMessage.bind(handler),
         );
         playerManager.setMessageInterceptor(
-            cast.framework.messages.MessageType.MEDIA_STATUS,
+            "MEDIA_STATUS",
             handler.interceptMediaStatusMessage.bind(handler),
         );
     }
@@ -72,8 +71,8 @@ export class PlaybackHandler {
         private readonly playerManager: PlayerManager,
     ) { }
 
-    public async interceptLoadMessage(message: LoadRequestData) {
-        const m = message;
+    public async interceptLoadMessage(message: RequestData) {
+        const m = message as LoadRequestData;
 
         if (m.media.contentUrl) {
             m.media.contentUrl = stripUrlProtocol(m.media.contentUrl);
@@ -112,31 +111,31 @@ export class PlaybackHandler {
         const now = playerManager.getCurrentTimeSec();
         if (message.relativeTime) {
             const newStartTime = Math.max(0, now + message.relativeTime);
-            await this.triggerSeekTo(newStartTime);
+            return this.triggerSeekTo(newStartTime);
         } else if (message.currentTime) {
-            await this.triggerSeekTo(message.currentTime);
+            return this.triggerSeekTo(message.currentTime);
         } else {
             debug("impossible seek request?");
         }
-        return message;
     }
 
     public async interceptPlayAgainMessage(message: RequestData) {
         debug("PLAY AGAIN REQUEST", message);
-        await this.triggerSeekTo(0);
-        return message;
+        return this.triggerSeekTo(0);
     }
 
-    public async interceptMediaStatusMessage(message: MediaStatus) {
-        message.currentTime += this.getStartTimeForCurrentMedia();
+    public async interceptMediaStatusMessage(message: RequestData) {
+        const m = message as unknown as cast.framework.messages.MediaStatus;
+
+        m.currentTime += this.getStartTimeForCurrentMedia();
 
         // NOTE: this may be unnecessary, but let's make sure that
         // we're using the monkey-patched duration
-        if (message.media) {
-            message.media.duration = this.playerManager.getDurationSec();
+        if (m.media) {
+            m.media.duration = this.playerManager.getDurationSec();
         }
 
-        return message;
+        return m;
     }
 
     private async triggerSeekTo(newStartTime: number) {
@@ -152,10 +151,9 @@ export class PlaybackHandler {
         const customData = this.getCustomDataForCurrentMedia();
 
         const newRequest = {
-            customData: {
-                ...customData,
+            customData: Object.assign({}, customData, {
                 startTimeAbsolute: newStartTime,
-            },
+            }),
             media: {
                 contentId: media.contentId,
                 contentType: media.contentType,
